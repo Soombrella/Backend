@@ -20,7 +20,7 @@ CREATE TABLE `item` (
   `item_id` int PRIMARY KEY AUTO_INCREMENT,
   `category_id` int NOT NULL,
   `serial_no` varchar(50) UNIQUE,
-  `status` varchar(20) NOT NULL DEFAULT ('AVAILABLE')
+  `status` varchar(20) NOT NULL DEFAULT 'AVAILABLE'
 );
 
 CREATE TABLE `reservation` (
@@ -29,7 +29,7 @@ CREATE TABLE `reservation` (
   `item_id` int NOT NULL,
   `cable` boolean DEFAULT false,
   `pickup_on` datetime NOT NULL,
-  `status` varchar(20) NOT NULL DEFAULT ('PENDING')
+  `status` varchar(20) NOT NULL DEFAULT 'PENDING'
 );
 
 CREATE TABLE `rental` (
