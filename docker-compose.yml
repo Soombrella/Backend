@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env.docker
+    container_name: soombrella-db
+    restart: always
+    ports:
+      - "3307:3306"
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+
+volumes:
+  db_data:
