@@ -50,7 +50,6 @@ class AuthService:
     def register_user(self, user_data: UserCreate) -> dict:
         # 🔒 bcrypt 72 byte 제한 체크 (필수)
         password_bytes = user_data.password.encode("utf-8")
-        print("",password_bytes)
         if len(password_bytes) > 72:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -82,8 +81,7 @@ class AuthService:
             "message": "회원가입 성공",
             "data": {
                 "member_id": user.id,
-                "student_no": user.student_no,
-                "name": user.name
+                "student_no": user.student_no
             }
         }
 
