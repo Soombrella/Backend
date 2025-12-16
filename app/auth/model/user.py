@@ -17,7 +17,6 @@ class User(Base):
     account_bank = Column(String(50), nullable=False)
     account_num = Column(String(50), nullable=False)
     is_admin = Column(Boolean, default=False)
-    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

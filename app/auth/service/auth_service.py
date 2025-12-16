@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 from app.auth.repository.user_repository import UserRepository
-from app.auth.schema.auth import UserCreate, UserLogin
+from app.auth.schema.auth import UserCreate, UserLogin, WithdrawRequest
 
 load_dotenv()
 
@@ -104,13 +104,6 @@ class AuthService:
                 detail="Incorrect student number or password"
             )
         
-        # 활성화 상태 확인
-        if not user.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Inactive user"
-            )
-        
         # JWT 토큰 생성 (학번을 sub에 저장)
         access_token = self.create_access_token(data={"sub": user.student_no})
         
@@ -139,4 +132,30 @@ class AuthService:
             return student_no
         except JWTError:
             return None
+
+    def withdraw_user(self, student_no: str, withdraw_data: WithdrawRequest) -> dict:
+        """회원 탈퇴"""
+        # 사용자 조회
+        user = self.user_repo.get_by_student_no(student_no)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # 비밀번호 검증
+        if not self.verify_password(withdraw_data.current_password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect password"
+            )
+        
+        # 사용자 삭제
+        self.user_repo.delete_user(user)
+        
+        return {
+            "success": True,
+            "message": "회원 탈퇴 완료"
+        }
 

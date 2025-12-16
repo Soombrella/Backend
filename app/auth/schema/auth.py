@@ -51,3 +51,12 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     student_no: Optional[str] = None
 
+
+class WithdrawRequest(BaseModel):
+    current_password: str
+
+
+class WithdrawResponse(BaseModel):
+    success: bool
+    message: str
+

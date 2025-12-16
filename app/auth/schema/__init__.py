@@ -5,7 +5,9 @@ from app.auth.schema.auth import (
     RegisterResponse,
     LoginResponse,
     Token,
-    TokenData
+    TokenData,
+    WithdrawRequest,
+    WithdrawResponse
 )
 
 __all__ = [
@@ -15,6 +17,8 @@ __all__ = [
     "RegisterResponse",
     "LoginResponse",
     "Token",
-    "TokenData"
+    "TokenData",
+    "WithdrawRequest",
+    "WithdrawResponse"
 ]
 
