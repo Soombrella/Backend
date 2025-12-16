@@ -48,27 +48,35 @@ class AuthService:
         return encoded_jwt
 
     def register_user(self, user_data: UserCreate) -> dict:
-        """회원가입"""
+        # 🔒 bcrypt 72 byte 제한 체크 (필수)
+        password_bytes = user_data.password.encode("utf-8")
+        print("password_bytes: ", password_bytes)
+        if len(password_bytes) > 72:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password too long (max 72 bytes for bcrypt)"
+            )
+
         # 학번 중복 확인
         if self.user_repo.get_by_student_no(user_data.student_no):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Student number already registered"
             )
-        
+
         # 이메일 중복 확인
         if self.user_repo.get_by_email(user_data.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
             )
-        
-        # 비밀번호 해싱
+
+        # 비밀번호 해싱 (딱 1번)
         hashed_password = self.get_password_hash(user_data.password)
-        
+
         # 사용자 생성
         user = self.user_repo.create(user_data, hashed_password)
-        
+
         return {
             "success": True,
             "message": "회원가입 성공",
@@ -77,6 +85,7 @@ class AuthService:
                 "student_no": user.student_no
             }
         }
+
 
     def authenticate_user(self, login_data: UserLogin) -> dict:
         """로그인"""
