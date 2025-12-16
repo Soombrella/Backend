@@ -4,11 +4,11 @@ from sqlalchemy import text
 from app.auth.router.auth_router import router as auth_router
 from app.db.database import engine, Base, get_db
 
+
 app = FastAPI(
     title="Soombrella Backend API",
     version="0.1.0",
 )
-
 
 @app.on_event("startup")
 def on_startup():

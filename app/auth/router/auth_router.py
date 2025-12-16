@@ -10,12 +10,15 @@ from app.auth.schema.auth import (
     LoginResponse,
     WithdrawRequest,
     WithdrawResponse,
+    FindPwResponse,
+    AuthCodeRequest,
+    AuthCodeVerify,
 )
 from app.auth.service.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-# 🔐 Swagger / Front / curl 전부 호환되는 Bearer 인증
+# Swagger / Front / curl 전부 호환되는 Bearer 인증
 security = HTTPBearer()
 
 
@@ -62,3 +65,23 @@ def withdraw(
 ):
     auth_service = AuthService(db)
     return auth_service.withdraw_user(student_no, withdraw_data)
+
+
+@router.post("/find-pw/request", response_model=FindPwResponse)
+def request_auth_code(
+    request_data: AuthCodeRequest,
+    db: Session = Depends(get_db),
+):
+    """비밀번호 찾기 - 인증번호 요청"""
+    auth_service = AuthService(db)
+    return auth_service.request_auth_code(request_data.email)
+
+
+@router.post("/find-pw/verify", response_model=FindPwResponse)
+def verify_auth_code(
+    verify_data: AuthCodeVerify,
+    db: Session = Depends(get_db),
+):
+    """비밀번호 찾기 - 인증번호 검증"""
+    auth_service = AuthService(db)
+    return auth_service.verify_auth_code(verify_data.email, verify_data.code)

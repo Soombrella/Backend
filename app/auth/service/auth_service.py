@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -6,7 +6,9 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 import os
 from dotenv import load_dotenv
-
+import random
+import string
+from app.auth.repository.auth_code_repository import AuthCodeRepository
 from app.auth.repository.user_repository import UserRepository
 from app.auth.schema.auth import UserCreate, UserLogin, WithdrawRequest
 
@@ -24,6 +26,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 class AuthService:
     def __init__(self, db: Session):
         self.user_repo = UserRepository(db)
+        self.auth_code_repo = AuthCodeRepository(db)
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -157,5 +160,74 @@ class AuthService:
         return {
             "success": True,
             "message": "회원 탈퇴 완료"
+        }
+
+    def request_auth_code(self, email: str) -> dict:
+        """비밀번호 찾기 - 인증번호 요청"""
+        # 이메일이 실제 회원인지 확인
+        user = self.user_repo.get_by_email(email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # 6자리 숫자 인증코드 생성
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
+        # 만료시간 설정 (10분 후)
+        expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+        
+        # DB에 인증코드 저장
+        self.auth_code_repo.create(
+            user_id=user.id,
+            email=email,
+            code=code,
+            expires_at=expires_at
+        )
+        
+        # TODO: 실제 이메일 전송 기능 구현 필요
+        # send_email(email, code)
+        print(f"[DEBUG] 인증코드 전송: {email} -> {code}")
+        
+        return {
+            "success": True,
+            "message": "인증번호가 이메일로 전송되었습니다."
+        }
+    
+    def verify_auth_code(self, email: str, code: str) -> dict:
+        """비밀번호 찾기 - 인증번호 검증 및 임시 비밀번호 발급"""
+        # 이메일이 실제 회원인지 확인
+        user = self.user_repo.get_by_email(email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        # 인증코드 검증
+        if not self.auth_code_repo.verify_code(email, code):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired code"
+            )
+        
+        # 임시 비밀번호 생성 (8자리 영문+숫자 조합)
+        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        
+        # 비밀번호 해싱 및 업데이트
+        hashed_password = self.get_password_hash(temp_password)
+        self.user_repo.update_password(user, hashed_password)
+        
+        # 인증코드 삭제 (한 번만 사용 가능하도록)
+        self.auth_code_repo.delete_by_email(email)
+        
+        # TODO: 실제 이메일 전송 기능 구현 필요
+        # send_email(email, temp_password)
+        print(f"[DEBUG] 임시 비밀번호 발급: {email} -> {temp_password}")
+        
+        return {
+            "success": True,
+            "message": "인증번호가 확인되었습니다. 임시 비밀번호를 이메일로 발송했습니다."
         }
 

@@ -40,4 +40,11 @@ class UserRepository:
     def delete_user(self, user: User):
         self.db.delete(user)
         self.db.commit()
+    
+    def update_password(self, user: User, hashed_password: str) -> User:
+        """비밀번호 업데이트"""
+        user.hashed_password = hashed_password
+        self.db.commit()
+        self.db.refresh(user)
+        return user
 

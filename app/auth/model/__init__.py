@@ -1,5 +1,6 @@
-from app.auth.model.user import User
+from .user import User
+from .auth_code import AuthCode
 
-__all__ = ["User"]
+__all__ = ["User","AuthCode"]
 
 
