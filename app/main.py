@@ -1,17 +1,19 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from app.db.database import SessionLocal
+from app.auth.router.auth_router import router as auth_router
+from app.db.database import engine, Base, get_db
 
-app = FastAPI()
+app = FastAPI(
+    title="Soombrella Backend API",
+    version="0.1.0",
+)
 
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(auth_router)
 
 
 @app.get("/db-test", summary="DB 연결 테스트")
