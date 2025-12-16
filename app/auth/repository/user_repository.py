@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.model.user import User
-from app.schema.auth import UserCreate
+from app.auth.model.user import User
+from app.auth.schema.auth import UserCreate
 from typing import Optional
 
 

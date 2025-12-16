@@ -5,6 +5,7 @@ from app.database import Base
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = {'mysql_charset': 'utf8mb4'}
 
     id = Column(Integer, primary_key=True, index=True)
     student_no = Column(String(20), unique=True, index=True, nullable=False)

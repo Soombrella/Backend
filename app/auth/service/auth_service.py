@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 import os
 from dotenv import load_dotenv
 
-from app.repository.user_repository import UserRepository
-from app.schema.auth import UserCreate, UserLogin
+from app.auth.repository.user_repository import UserRepository
+from app.auth.schema.auth import UserCreate, UserLogin
 
 load_dotenv()
 
@@ -50,7 +50,7 @@ class AuthService:
     def register_user(self, user_data: UserCreate) -> dict:
         # 🔒 bcrypt 72 byte 제한 체크 (필수)
         password_bytes = user_data.password.encode("utf-8")
-        print("password_bytes: ", password_bytes)
+        print("",password_bytes)
         if len(password_bytes) > 72:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -82,7 +82,8 @@ class AuthService:
             "message": "회원가입 성공",
             "data": {
                 "member_id": user.id,
-                "student_no": user.student_no
+                "student_no": user.student_no,
+                "name": user.name
             }
         }
 
