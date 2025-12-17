@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.auth.router.auth_router import router as auth_router
+from app.personal.router.personal_router import router as personal_router
 from app.db.database import engine, Base, get_db
 
 
@@ -16,6 +17,7 @@ def on_startup():
 
 
 app.include_router(auth_router)
+app.include_router(personal_router)
 
 
 @app.get("/db-test", summary="DB 연결 테스트")

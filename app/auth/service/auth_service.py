@@ -51,7 +51,7 @@ class AuthService:
         return encoded_jwt
 
     def register_user(self, user_data: UserCreate) -> dict:
-        # 🔒 bcrypt 72 byte 제한 체크 (필수)
+        # bcrypt 72 byte 제한 체크 (필수)
         password_bytes = user_data.password.encode("utf-8")
         if len(password_bytes) > 72:
             raise HTTPException(
