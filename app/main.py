@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.auth.router.auth_router import router as auth_router
 from app.manage.router.manage_router import router as manage_router
+from app.items.router.items_router import router as items_router
 from app.personal.router.personal_router import router as personal_router
 from app.db.database import engine, Base, get_db
 
@@ -21,6 +23,19 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# CORS 설정
+origins = [
+    "http://localhost:3000",  # 프론트엔드 로컬 개발 서버
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
+    allow_headers=["*"],  # 모든 헤더 허용
+)
+
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
@@ -28,6 +43,7 @@ def on_startup():
 
 app.include_router(auth_router)
 app.include_router(manage_router)
+app.include_router(items_router)
 app.include_router(personal_router)
 app.include_router(rental_router)
 
