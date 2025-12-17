@@ -57,7 +57,7 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
     return auth_service.authenticate_user(login_data)
 
 
-@router.post("/withdraw", response_model=WithdrawResponse)
+@router.delete("/withdraw", response_model=WithdrawResponse)
 def withdraw(
     withdraw_data: WithdrawRequest,
     student_no: str = Depends(get_current_user),

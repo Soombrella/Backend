@@ -13,6 +13,7 @@ from app.manage.model.rental import Rental
 from app.manage.model.reservation import Reservation
 from app.manage.model.bank_account import BankAccount
 from app.manage.model.deposit_txn import DepositTxn
+from app.rental.router.rental_router import router as rental_router
 
 
 app = FastAPI(
@@ -28,6 +29,7 @@ def on_startup():
 app.include_router(auth_router)
 app.include_router(manage_router)
 app.include_router(personal_router)
+app.include_router(rental_router)
 
 
 @app.get("/db-test", summary="DB 연결 테스트")
