@@ -59,7 +59,22 @@ CREATE TABLE `bank_account` (
   `account_num` varchar(50) NOT NULL
 );
 
+CREATE TABLE `auth_code` (
+  `auth_code_id` int PRIMARY KEY AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `code_hash` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL
+);
+
+CREATE INDEX idx_auth_code_email
+  ON auth_code (email);
+
+CREATE INDEX idx_auth_code_expires_at
+  ON auth_code (expires_at);
+
 ALTER TABLE `member` COMMENT = '학생(회원) 정보';
+
+ALTER TABLE `auth_code` COMMENT = '이메일 인증번호 (비밀번호 재설정, 이메일 인증)';
 
 ALTER TABLE `item_category` COMMENT = '비품 카테고리 (우산/보조배터리 등)';
 
