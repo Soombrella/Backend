@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.auth.router.auth_router import router as auth_router
@@ -17,6 +18,19 @@ from app.manage.model.deposit_txn import DepositTxn
 app = FastAPI(
     title="Soombrella Backend API",
     version="0.1.0",
+)
+
+# CORS 설정
+origins = [
+    "http://localhost:3000",  # 프론트엔드 로컬 개발 서버
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
+    allow_headers=["*"],  # 모든 헤더 허용
 )
 
 @app.on_event("startup")
