@@ -2,7 +2,16 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.auth.router.auth_router import router as auth_router
+from app.manage.router.manage_router import router as manage_router
 from app.db.database import engine, Base, get_db
+
+# 모델 import (테이블 자동 생성용)
+from app.auth.model.user import User
+from app.manage.model.item import Item, ItemCategory
+from app.manage.model.rental import Rental
+from app.manage.model.reservation import Reservation
+from app.manage.model.bank_account import BankAccount
+from app.manage.model.deposit_txn import DepositTxn
 
 app = FastAPI(
     title="Soombrella Backend API",
@@ -14,6 +23,7 @@ def on_startup():
     Base.metadata.create_all(bind=engine)
 
 app.include_router(auth_router)
+app.include_router(manage_router)
 
 
 @app.get("/db-test", summary="DB 연결 테스트")
