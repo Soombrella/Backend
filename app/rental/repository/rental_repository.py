@@ -13,7 +13,7 @@ class RentalRepository:
     def get_by_student_no(self, student_no: str):
         return (
             self.db.query(Reservation, Rental, Item, ItemCategory)
-            .join(Member, Reservation.member_id == Member.id)
+            .join(Member, Reservation.member_id == Member.member_id)
             .join(Item, Reservation.item_id == Item.item_id)
             .join(ItemCategory, Item.category_id == ItemCategory.category_id)
             .outerjoin(Rental, Reservation.reservation_id == Rental.reservation_id)
