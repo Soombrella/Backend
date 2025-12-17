@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from datetime import datetime, timedelta
 
-from app.auth.model.user import User
+from app.auth.model.user import Member
 from app.manage.model.item import Item, ItemCategory
 from app.manage.model.rental import Rental
 from app.manage.model.reservation import Reservation
@@ -62,15 +62,15 @@ class ManageRepository:
 
     # ==================== User 관련 ====================
 
-    def get_all_users(self) -> List[User]:
+    def get_all_users(self) -> List[Member]:
         """모든 사용자 조회"""
-        return self.db.query(User).all()
+        return self.db.query(Member).all()
 
-    def get_user_by_id(self, user_id: int) -> Optional[User]:
+    def get_user_by_id(self, user_id: int) -> Optional[Member]:
         """ID로 사용자 조회"""
-        return self.db.query(User).filter(User.id == user_id).first()
+        return self.db.query(Member).filter(Member.id == user_id).first()
 
-    def delete_user(self, user: User) -> None:
+    def delete_user(self, user: Member) -> None:
         """사용자 삭제"""
         self.db.delete(user)
         self.db.commit()

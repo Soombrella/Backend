@@ -9,7 +9,7 @@ class Reservation(Base):
     __table_args__ = {'mysql_charset': 'utf8mb4'}
 
     reservation_id = Column(Integer, primary_key=True, autoincrement=True)
-    member_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    member_id = Column(Integer, ForeignKey("member.member_id"), nullable=False)
     item_id = Column(Integer, ForeignKey("item.item_id"), nullable=False)
     cable = Column(Boolean, default=False)
     pickup_on = Column(DateTime, nullable=False)
@@ -17,6 +17,6 @@ class Reservation(Base):
     # status: PENDING, CONFIRMED, CANCELLED 등
 
     # relationships
-    member = relationship("User", backref="reservations")
+    member = relationship("Member", backref="reservations")
     item = relationship("Item", backref="reservations")
 

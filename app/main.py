@@ -7,7 +7,7 @@ from app.personal.router.personal_router import router as personal_router
 from app.db.database import engine, Base, get_db
 
 # 모델 import (테이블 자동 생성용)
-from app.auth.model.user import User
+from app.auth.model.user import Member
 from app.manage.model.item import Item, ItemCategory
 from app.manage.model.rental import Rental
 from app.manage.model.reservation import Reservation

@@ -7,7 +7,7 @@ class AuthCode(Base):
 
     id = Column(
         Integer,
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("member.member_id", ondelete="CASCADE"),
         primary_key=True
     )
 

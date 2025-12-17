@@ -9,10 +9,10 @@ class BankAccount(Base):
     __table_args__ = {'mysql_charset': 'utf8mb4'}
 
     account_id = Column(Integer, primary_key=True, autoincrement=True)
-    member_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    member_id = Column(Integer, ForeignKey("member.member_id"), nullable=False)
     account_bank = Column(String(20), nullable=False)
     account_num = Column(String(50), nullable=False)
 
     # relationship
-    member = relationship("User", backref="bank_accounts")
+    member = relationship("Member", backref="bank_accounts")
 
