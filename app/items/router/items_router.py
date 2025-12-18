@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 
 from app.db.database import get_db
-from app.auth.model.user import User
+from app.auth.model.user import Member
 from app.auth.dependencies import get_current_user_obj
 from app.items.service.items_service import ItemsService
 from app.items.schema.items import (
@@ -59,10 +59,10 @@ COUNT_RESPONSES = {
 def rent_item(
     rent_data: RentRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_obj),
+    current_user: Member = Depends(get_current_user_obj),
 ):
     service = ItemsService(db)
-    return service.rent_item(current_user.id, rent_data)
+    return service.rent_item(current_user.member_id, rent_data)
 
 
 @router.get(
@@ -80,7 +80,7 @@ def rent_item(
 def get_available_count(
     category_id: Optional[int] = Query(None, description="카테고리 ID (없으면 전체 조회)"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user_obj),
+    current_user: Member = Depends(get_current_user_obj),
 ):
     service = ItemsService(db)
     return service.get_available_count(category_id)

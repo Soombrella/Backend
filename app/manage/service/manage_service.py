@@ -35,7 +35,7 @@ class ManageService:
             # 회원 정보
             member = reservation.member
             member_info = MemberInfo(
-                member_id=member.id,
+                member_id=member.member_id,
                 name=member.name,
                 student_no=member.student_no,
             )
@@ -75,7 +75,7 @@ class ManageService:
                 rental_status = "환급전"
             
             # 환불 계좌 정보
-            bank_account = self.repo.get_bank_account_by_member_id(member.id)
+            bank_account = self.repo.get_bank_account_by_member_id(member.member_id)
             if bank_account:
                 refund_account = RefundAccountInfo(
                     account_bank=bank_account.account_bank,

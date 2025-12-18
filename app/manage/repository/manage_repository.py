@@ -68,7 +68,7 @@ class ManageRepository:
 
     def get_user_by_id(self, user_id: int) -> Optional[Member]:
         """ID로 사용자 조회"""
-        return self.db.query(Member).filter(Member.id == user_id).first()
+        return self.db.query(Member).filter(Member.member_id == user_id).first()
 
     def delete_user(self, user: Member) -> None:
         """사용자 삭제"""
