@@ -14,5 +14,5 @@ class BankAccount(Base):
     account_num = Column(String(50), nullable=False)
 
     # relationship
-    member = relationship("Member", backref="bank_accounts")
+    member = relationship("Member", back_populates="bank_account")
 
