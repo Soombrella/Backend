@@ -18,3 +18,4 @@ class RentalItem(BaseModel):
 
 class RentalResponse(BooleanResponse):
     data: List[RentalItem]
+
