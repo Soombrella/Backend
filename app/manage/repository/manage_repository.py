@@ -106,9 +106,30 @@ class ManageRepository:
         self.db.refresh(item)
         return item
 
+    # def delete_item(self, item: Item) -> None:
+    #     """재고 삭제"""
+    #     self.db.delete(item)
+    #     self.db.commit()
+
     def delete_item(self, item: Item) -> None:
-        """재고 삭제"""
+        # 해당 item의 보증금 내역 삭제
+        self.db.query(DepositTxn).filter(
+            DepositTxn.item_id == item.item_id
+        ).delete()
+
+        # 대여 삭제
+        self.db.query(Rental).filter(
+            Rental.item_id == item.item_id
+        ).delete()
+
+        # 예약 삭제
+        self.db.query(Reservation).filter(
+            Reservation.item_id == item.item_id
+        ).delete()
+
+        # 아이템 삭제
         self.db.delete(item)
+
         self.db.commit()
 
     # ==================== Rental 관련 ====================
