@@ -60,7 +60,7 @@ CREATE TABLE `bank_account` (
 );
 
 CREATE TABLE `auth_code` (
-  `auth_code_id` int PRIMARY KEY AUTO_INCREMENT,
+  `member_id` int PRIMARY KEY,
   `email` varchar(255) NOT NULL,
   `code_hash` varchar(255) NOT NULL,
   `expires_at` datetime NOT NULL
@@ -71,6 +71,14 @@ CREATE INDEX idx_auth_code_email
 
 CREATE INDEX idx_auth_code_expires_at
   ON auth_code (expires_at);
+
+ALTER TABLE `auth_code`
+  COMMENT = '이메일 인증번호 (비밀번호 재설정, 이메일 인증)';
+
+ALTER TABLE `auth_code`
+  ADD FOREIGN KEY (`member_id`)
+  REFERENCES `member` (`member_id`)
+  ON DELETE CASCADE;
 
 ALTER TABLE `member` COMMENT = '학생(회원) 정보';
 

@@ -60,3 +60,30 @@ class WithdrawResponse(BaseModel):
     success: bool
     message: str
 
+# auth_code
+class FindPwResponse(BaseModel):
+    success: bool
+    message: str
+
+class AuthCodeRequest(BaseModel):
+    email: EmailStr
+
+class AuthCodeVerify(BaseModel):
+    email: EmailStr
+    code: str
+
+class AuthCodeCreate(BaseModel):
+    id : int
+    email : str
+    code : str
+    expires_at : datetime
+
+#=================비밀번호 변경===================#
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class ChangePasswordResponse(BaseModel):
+    success: bool
+    message: str

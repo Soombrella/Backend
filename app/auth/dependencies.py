@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.auth.model.user import User
+from app.auth.model.user import Member
 from app.auth.service.auth_service import AuthService
 from app.auth.repository.user_repository import UserRepository
 
@@ -13,7 +13,7 @@ security = HTTPBearer()
 def get_current_user_obj(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db),
-) -> User:
+) -> Member:
     """
     JWT 토큰에서 사용자 정보를 추출하고 User 객체 반환
     """
@@ -39,8 +39,8 @@ def get_current_user_obj(
 
 
 def get_current_admin_user(
-    current_user: User = Depends(get_current_user_obj),
-) -> User:
+    current_user: Member = Depends(get_current_user_obj),
+) -> Member:
     """
     관리자 권한 체크 - is_admin이 True인 사용자만 통과
     """

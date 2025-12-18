@@ -10,7 +10,7 @@ class Rental(Base):
 
     rental_id = Column(Integer, primary_key=True, autoincrement=True)
     reservation_id = Column(Integer, ForeignKey("reservation.reservation_id"), nullable=True)
-    member_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    member_id = Column(Integer, ForeignKey("member.member_id"), nullable=False)
     item_id = Column(Integer, ForeignKey("item.item_id"), nullable=False)
     cable = Column(Boolean, default=False)
     rented_on = Column(DateTime, nullable=False)
@@ -19,5 +19,5 @@ class Rental(Base):
 
     # relationships
     reservation = relationship("Reservation", backref="rental")
-    member = relationship("User", backref="rentals")
+    member = relationship("Member", backref="rentals")
     item = relationship("Item", backref="rentals")

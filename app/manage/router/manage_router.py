@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.auth.model.user import User
+from app.auth.model.user import Member
 from app.auth.dependencies import get_current_admin_user
 from app.manage.service.manage_service import ManageService
 from app.manage.schema.manage import (
@@ -60,7 +60,7 @@ DELETE_RESPONSES = {
 )
 def get_users(
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
+    admin: Member = Depends(get_current_admin_user),
 ):
     service = ManageService(db)
     return service.get_all_user_rentals()
@@ -85,7 +85,7 @@ def update_user(
     user_id: int,
     update_data: UserRentalStatusUpdate,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
+    admin: Member = Depends(get_current_admin_user),
 ):
     service = ManageService(db)
     return service.update_user_rental_status(user_id, update_data)
@@ -101,7 +101,7 @@ def update_user(
 def delete_user_rentals(
     user_id: int,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
+    admin: Member = Depends(get_current_admin_user),
 ):
     service = ManageService(db)
     return service.delete_user_rentals(user_id)
@@ -118,7 +118,7 @@ def delete_user_rentals(
 )
 def get_items(
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
+    admin: Member = Depends(get_current_admin_user),
 ):
     service = ManageService(db)
     return service.get_all_items()
@@ -144,7 +144,7 @@ def update_item(
     item_id: int,
     update_data: ItemUpdate,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
+    admin: Member = Depends(get_current_admin_user),
 ):
     service = ManageService(db)
     return service.update_item(item_id, update_data)
@@ -160,7 +160,7 @@ def update_item(
 def delete_item(
     item_id: int,
     db: Session = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
+    admin: Member = Depends(get_current_admin_user),
 ):
     service = ManageService(db)
     return service.delete_item(item_id)
