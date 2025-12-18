@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 from app.auth.repository.user_repository import UserRepository
 from app.auth.repository.auth_code_repository import AuthCodeRepository
-from app.auth.schema.auth import UserCreate, UserLogin, WithdrawRequest
+from app.auth.schema.auth import ChangePasswordRequest, ChangePasswordResponse, UserCreate, UserLogin, WithdrawRequest
 
 load_dotenv()
 
@@ -25,6 +25,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 
 class AuthService:
     def __init__(self, db: Session):
+        self.db=db
         self.user_repo = UserRepository(db)
         self.auth_code_repo = AuthCodeRepository(db)
 
@@ -128,3 +129,27 @@ class AuthService:
 
         print(f"[DEBUG] temp password: {email} -> {temp_password}")
         return {"success": True, "message": "임시 비밀번호를 이메일로 발송했습니다."}
+
+    def change_password(
+        self,
+        user,  # Member 객체
+        data: ChangePasswordRequest,
+    ) -> ChangePasswordResponse:
+        # 1. 현재 비밀번호 검증
+        if not pwd_context.verify(data.current_password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="현재 비밀번호가 올바르지 않습니다.",
+            )
+
+        # 2. 새 비밀번호 해싱
+        new_hash = pwd_context.hash(data.new_password)
+
+        # 3. DB 업데이트
+        user_repo = UserRepository(self.db)
+        user_repo.update_password(user, new_hash)
+
+        return ChangePasswordResponse(
+            success=True,
+            message="비밀번호가 변경되었습니다.",
+        )

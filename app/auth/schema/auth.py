@@ -77,3 +77,13 @@ class AuthCodeCreate(BaseModel):
     email : str
     code : str
     expires_at : datetime
+
+#=================비밀번호 변경===================#
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class ChangePasswordResponse(BaseModel):
+    success: bool
+    message: str

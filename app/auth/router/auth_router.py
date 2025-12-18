@@ -2,9 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
+from app.auth.dependencies import get_current_user_obj
 from app.db.database import get_db
 from app.auth.service.auth_service import AuthService
 from app.auth.schema.auth import (
+    ChangePasswordRequest,
+    ChangePasswordResponse,
     UserCreate,
     UserLogin,
     RegisterResponse,
@@ -56,3 +59,15 @@ def request_auth_code(request_data: AuthCodeRequest, db: Session = Depends(get_d
 @router.post("/find-pw/verify", response_model=FindPwResponse)
 def verify_auth_code(verify_data: AuthCodeVerify, db: Session = Depends(get_db)):
     return AuthService(db).verify_auth_code(verify_data.email, verify_data.code)
+
+@router.patch(
+    "/password",
+    response_model=ChangePasswordResponse,
+    summary="비밀번호 변경",
+)
+def change_password(
+    data: ChangePasswordRequest,
+    current_user = Depends(get_current_user_obj),
+    db: Session = Depends(get_db),
+):
+    return AuthService(db).change_password(current_user, data)
