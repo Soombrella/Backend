@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 from app.auth.repository.user_repository import UserRepository
 from app.auth.repository.auth_code_repository import AuthCodeRepository
 from app.auth.schema.auth import ChangePasswordRequest, ChangePasswordResponse, UserCreate, UserLogin, WithdrawRequest
+from app.common.email import send_email
 
 load_dotenv()
 
@@ -105,30 +106,80 @@ class AuthService:
         self.user_repo.delete_user(user)
         return {"success": True, "message": "회원 탈퇴 완료"}
 
-    def request_auth_code(self, email: str) -> dict:
+    # ==================== 인증번호 요청 ====================
+
+    def request_auth_code(self, email: str):
         user = self.user_repo.get_by_email(email)
         if not user:
-            raise HTTPException(404, "User not found")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="존재하지 않는 이메일입니다.",
+            )
 
-        code = ''.join(str(random.randint(0, 9)) for _ in range(6))
-        expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+        code = f"{random.randint(0, 999999):06d}"
+        expires_at = datetime.now() + timedelta(minutes=5)
 
-        self.auth_code_repo.create(email=email, code=code, expires_at=expires_at)
+        self.auth_code_repo.create(
+            member_id=user.member_id,
+            email=email,
+            code_hash=code,
+            expires_at=expires_at,
+        )
 
-        print(f"[DEBUG] auth code: {email} -> {code}")
-        return {"success": True, "message": "인증번호가 이메일로 전송되었습니다."}
+        send_email(
+            to_email=email,
+            subject="[Soombrella] 비밀번호 재설정 인증번호",
+            content=f"인증번호는 {code} 입니다.\n5분 이내에 입력해주세요.",
+        )
 
-    def verify_auth_code(self, email: str, code: str) -> dict:
-        if not self.auth_code_repo.verify_code(email, code):
-            raise HTTPException(400, "Invalid or expired code")
+        return {
+            "success": True,
+            "message": "인증번호가 이메일로 전송되었습니다.",
+        }
+
+    # ==================== 인증번호 검증 ====================
+
+    def verify_auth_code(self, email: str, code: str):
+        auth_code = self.auth_code_repo.get_by_email(email)
+        if not auth_code:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="인증번호가 존재하지 않습니다.",
+            )
+
+        if datetime.now(auth_code.expires_at.tzinfo) > auth_code.expires_at:
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE,
+                detail="인증번호가 만료되었습니다.",
+            )
+
+        if auth_code.code_hash != code:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="인증번호가 일치하지 않습니다.",
+            )
+
+        # 임시 비밀번호 생성
+        temp_password = "".join(
+            random.choices(string.ascii_letters + string.digits, k=10)
+        )
+        hashed_pw = pwd_context.hash(temp_password)
 
         user = self.user_repo.get_by_email(email)
-        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-        self.user_repo.update_password(user, self.get_password_hash(temp_password))
+        self.user_repo.update_password(user, hashed_pw)
+
         self.auth_code_repo.delete_by_email(email)
 
-        print(f"[DEBUG] temp password: {email} -> {temp_password}")
-        return {"success": True, "message": "임시 비밀번호를 이메일로 발송했습니다."}
+        send_email(
+            to_email=email,
+            subject="[Soombrella] 임시 비밀번호 안내",
+            content=f"임시 비밀번호는 다음과 같습니다:\n\n{temp_password}\n\n로그인 후 반드시 변경해주세요.",
+        )
+
+        return {
+            "success": True,
+            "message": "인증번호가 확인되었습니다. 임시 비밀번호를 이메일로 발송했습니다.",
+        }
 
     def change_password(
         self,

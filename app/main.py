@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -9,12 +12,6 @@ from app.personal.router.personal_router import router as personal_router
 from app.db.database import engine, Base, get_db
 
 # 모델 import (테이블 자동 생성용)
-from app.auth.model.user import Member
-from app.manage.model.item import Item, ItemCategory
-from app.manage.model.rental import Rental
-from app.manage.model.reservation import Reservation
-from app.manage.model.bank_account import BankAccount
-from app.manage.model.deposit_txn import DepositTxn
 from app.rental.router.rental_router import router as rental_router
 from app.reservation.router.reservation_router import router as reservation_router
 

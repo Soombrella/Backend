@@ -58,7 +58,10 @@ def request_auth_code(request_data: AuthCodeRequest, db: Session = Depends(get_d
 
 @router.post("/find-pw/verify", response_model=FindPwResponse)
 def verify_auth_code(verify_data: AuthCodeVerify, db: Session = Depends(get_db)):
-    return AuthService(db).verify_auth_code(verify_data.email, verify_data.code)
+    return AuthService(db).verify_auth_code(
+        verify_data.email,
+        verify_data.code
+    )
 
 @router.patch(
     "/password",

@@ -7,18 +7,18 @@ class AuthCodeRepository:
     def __init__(self, db: Session):
         self.db = db
     
-    def create(self, user_id: int, email: str, code: str, expires_at: datetime) -> AuthCode:
+    def create(self, member_id: int, email: str, code_hash: str, expires_at: datetime) -> AuthCode:
         """인증코드 생성 (기존 코드가 있으면 업데이트)"""
         # 기존 코드가 있으면 삭제
-        existing = self.db.query(AuthCode).filter(AuthCode.id == user_id).first()
+        existing = self.db.query(AuthCode).filter(AuthCode.member_id == member_id).first()
         if existing:
             self.db.delete(existing)
             self.db.commit()
         
         db_auth_code = AuthCode(
-            id=user_id,
+            member_id=member_id,
             email=email,
-            code=code,
+            code_hash=code_hash,
             expires_at=expires_at
         )
         self.db.add(db_auth_code)
@@ -37,7 +37,7 @@ class AuthCodeRepository:
             return False
         
         # 코드 일치 확인
-        if auth_code.code != code:
+        if auth_code.code_hash != code:
             return False
         
         # 만료시간 확인
