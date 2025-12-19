@@ -201,16 +201,27 @@ def get_item(
     description="""
 새로운 물품을 등록합니다. (관리자 전용)
 
-**요청 예시:**
+**요청 예시 (우산):**
 ```json
 {
-  "category_id": 1,
-  "serial_no": "UMB-001",
-  "status": "AVAILABLE"
+  "category_name": "umbrella",
+  "serial_no": "UMB-001"
 }
 ```
 
-**status 값:**
+**요청 예시 (보조배터리):**
+```json
+{
+  "category_name": "powerbank",
+  "serial_no": "PB-001"
+}
+```
+
+**category_name 값:**
+- `umbrella`: 우산
+- `powerbank`: 보조배터리
+
+**status 값 (선택, 기본값: AVAILABLE):**
 - `AVAILABLE`: 사용 가능
 - `RENTED`: 대여중
 - `RESERVED`: 예약중
@@ -237,11 +248,15 @@ def create_item(
 **요청 예시:**
 ```json
 {
-  "category_id": 2,
+  "category_name": "powerbank",
   "serial_no": "PB-001",
   "status": "AVAILABLE"
 }
 ```
+
+**category_name 값:**
+- `umbrella`: 우산
+- `powerbank`: 보조배터리
     """,
 )
 def update_item(
@@ -268,3 +283,4 @@ def delete_item(
 ):
     service = AdminService(db)
     return service.delete_item(item_id)
+

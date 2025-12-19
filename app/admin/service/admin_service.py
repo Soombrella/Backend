@@ -12,6 +12,12 @@ from app.admin.schema.admin import (
     ItemResponse,
 )
 
+# 영문 → 한글 카테고리 매핑
+CATEGORY_NAME_MAP = {
+    "umbrella": "우산",
+    "powerbank": "보조배터리",
+}
+
 
 class AdminService:
     def __init__(self, db: Session):
@@ -187,12 +193,20 @@ class AdminService:
 
     def create_item(self, data: ItemCreate) -> dict:
         """물품 생성"""
+        # 영문 카테고리명 → 한글 변환
+        category_name_kr = CATEGORY_NAME_MAP.get(data.category_name.lower())
+        if not category_name_kr:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"카테고리 '{data.category_name}'을(를) 찾을 수 없습니다. (umbrella 또는 powerbank 사용)",
+            )
+        
         # 카테고리 존재 확인
-        category = self.repo.get_category_by_id(data.category_id)
+        category = self.repo.get_category_by_name(category_name_kr)
         if not category:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="존재하지 않는 카테고리입니다.",
+                detail=f"카테고리 '{category_name_kr}'이(가) DB에 존재하지 않습니다.",
             )
         
         # 시리얼 번호 중복 체크
@@ -213,7 +227,7 @@ class AdminService:
             )
         
         item = self.repo.create_item(
-            category_id=data.category_id,
+            category_id=category.category_id,
             serial_no=data.serial_no,
             status=data.status,
         )
@@ -243,14 +257,22 @@ class AdminService:
                 detail="물품을 찾을 수 없습니다.",
             )
         
-        # 카테고리 존재 확인
-        if data.category_id is not None:
-            category = self.repo.get_category_by_id(data.category_id)
+        # 카테고리 존재 확인 (영문 → 한글 변환)
+        category_id_to_update = None
+        if data.category_name is not None:
+            category_name_kr = CATEGORY_NAME_MAP.get(data.category_name.lower())
+            if not category_name_kr:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"카테고리 '{data.category_name}'을(를) 찾을 수 없습니다. (umbrella 또는 powerbank 사용)",
+                )
+            category = self.repo.get_category_by_name(category_name_kr)
             if not category:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="존재하지 않는 카테고리입니다.",
+                    detail=f"카테고리 '{category_name_kr}'이(가) DB에 존재하지 않습니다.",
                 )
+            category_id_to_update = category.category_id
         
         # 시리얼 번호 중복 체크
         if data.serial_no:
@@ -271,8 +293,8 @@ class AdminService:
                 )
         
         update_dict = {}
-        if data.category_id is not None:
-            update_dict["category_id"] = data.category_id
+        if category_id_to_update is not None:
+            update_dict["category_id"] = category_id_to_update
         if data.serial_no is not None:
             update_dict["serial_no"] = data.serial_no
         if data.status is not None:
@@ -301,3 +323,4 @@ class AdminService:
             "success": True,
             "message": "물품이 삭제되었습니다.",
         }
+

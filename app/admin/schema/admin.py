@@ -51,15 +51,23 @@ class CategoryDetailResponse(BaseModel):
 # ==================== Item 관련 ====================
 
 class ItemCreate(BaseModel):
-    """물품 생성 요청"""
-    category_id: int
+    """
+    물품 생성 요청
+    
+    - category_name: "umbrella" (우산) 또는 "powerbank" (보조배터리)
+    """
+    category_name: str
     serial_no: Optional[str] = None
     status: str = "AVAILABLE"
 
 
 class ItemFullUpdate(BaseModel):
-    """물품 전체 수정 요청"""
-    category_id: Optional[int] = None
+    """
+    물품 전체 수정 요청
+    
+    - category_name: "umbrella" (우산) 또는 "powerbank" (보조배터리)
+    """
+    category_name: Optional[str] = None
     serial_no: Optional[str] = None
     status: Optional[str] = None
 
@@ -88,3 +96,4 @@ class ItemDetailResponse(BaseModel):
     success: bool
     message: str
     data: ItemResponse
+
