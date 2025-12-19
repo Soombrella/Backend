@@ -121,3 +121,4 @@ class AdminRepository:
         # 물품 삭제
         self.db.delete(item)
         self.db.commit()
+
