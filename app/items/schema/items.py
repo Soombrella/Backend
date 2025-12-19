@@ -8,7 +8,7 @@ class RentRequest(BaseModel):
     """
     물품 대여 예약 요청
     
-    - category_name: 물품 종류 (우산, 보조배터리)
+    - category_name: 물품 종류 (umbrella, powerbank)
     - pickup_on: 방문 예정일 (YYYY-MM-DD)
     - cable: 보조배터리 케이블 여부 (케이블 대여X or 우산 → false)
     - proxy_return: 대리 반납 여부

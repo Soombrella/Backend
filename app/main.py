@@ -9,6 +9,7 @@ from app.auth.router.auth_router import router as auth_router
 from app.manage.router.manage_router import router as manage_router
 from app.items.router.items_router import router as items_router
 from app.personal.router.personal_router import router as personal_router
+from app.admin.router.admin_router import router as admin_router
 from app.db.database import engine, Base, get_db
 
 # 모델 import (테이블 자동 생성용)
@@ -46,6 +47,7 @@ app.include_router(items_router)
 app.include_router(personal_router)
 app.include_router(rental_router)
 app.include_router(reservation_router)
+app.include_router(admin_router)
 
 
 @app.get("/db-test", summary="DB 연결 테스트")

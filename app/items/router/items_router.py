@@ -48,12 +48,14 @@ COUNT_RESPONSES = {
 **요청 예시:**
 ```json
 {
-  "category_name": "우산",
+  "category_name": "umbrella",
   "pickup_on": "2025-11-01",
   "cable": false,
   "proxy_return": true
 }
 ```
+
+- category_name: "umbrella" (우산) 또는 "powerbank" (보조배터리)
     """,
 )
 def rent_item(
