@@ -38,7 +38,7 @@ class AvailableCountResponse(BaseModel):
     물품 재고 수 조회 응답
     
     카테고리 구분 필요 시 QueryString으로 확장 가능
-    예: /items/available/count?category_id=2
+    예: /items/available/count?category_name=umbrella
     """
     success: bool
     message: str

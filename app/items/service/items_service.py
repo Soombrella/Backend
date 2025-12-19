@@ -79,29 +79,31 @@ class ItemsService:
 
     # ==================== 2. 물품 재고 수 조회 ====================
 
-    def get_available_count(self, category_id: int = None) -> dict:
+    def get_available_count(self, category_name: str = None) -> dict:
         """
         물품 재고 수 조회
         
-        - category_id가 없으면 전체 카테고리별 재고 수 반환
-        - category_id가 있으면 해당 카테고리만 반환
+        - category_name이 없으면 전체 카테고리별 재고 수 반환
+        - category_name이 있으면 해당 카테고리만 반환
         """
-        if category_id:
-            # 특정 카테고리만 조회
-            categories = self.repo.get_all_categories()
-            target_category = None
-            for cat in categories:
-                if cat.category_id == category_id:
-                    target_category = cat
-                    break
+        if category_name:
+            # 카테고리명 검증
+            category_name_lower = category_name.lower()
+            if category_name_lower not in VALID_CATEGORY_NAMES:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"카테고리 '{category_name}'을(를) 찾을 수 없습니다. (umbrella 또는 powerbank 사용)",
+                )
             
+            # 특정 카테고리만 조회
+            target_category = self.repo.get_category_by_name(category_name_lower)
             if not target_category:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"카테고리 ID {category_id}를 찾을 수 없습니다.",
+                    detail=f"카테고리 '{category_name_lower}'을(를) 찾을 수 없습니다.",
                 )
             
-            count = self.repo.get_available_count_by_category(category_id)
+            count = self.repo.get_available_count_by_category(target_category.category_id)
             data = [
                 AvailableCountItem(
                     category_name=target_category.category_name,

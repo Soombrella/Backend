@@ -76,14 +76,16 @@ def rent_item(
 물품 재고 수를 조회합니다. (로그인 필요)
 
 카테고리 구분 필요 시 QueryString으로 확장 가능
-예: `/items/available/count?category_id=2`
+예: `/items/available/count?category_name=umbrella`
+
+- category_name: "umbrella" (우산) 또는 "powerbank" (보조배터리)
     """,
 )
 def get_available_count(
-    category_id: Optional[int] = Query(None, description="카테고리 ID (없으면 전체 조회)"),
+    category_name: Optional[str] = Query(None, description="카테고리명 (umbrella/powerbank, 없으면 전체 조회)"),
     db: Session = Depends(get_db),
     current_user: Member = Depends(get_current_user_obj),
 ):
     service = ItemsService(db)
-    return service.get_available_count(category_id)
+    return service.get_available_count(category_name)
 
