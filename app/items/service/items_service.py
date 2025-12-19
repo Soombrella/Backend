@@ -5,6 +5,12 @@ from datetime import datetime
 from app.items.repository.items_repository import ItemsRepository
 from app.items.schema.items import RentRequest, AvailableCountItem
 
+# 영문 → 한글 카테고리 매핑
+CATEGORY_NAME_MAP = {
+    "umbrella": "우산",
+    "powerbank": "보조배터리",
+}
+
 
 class ItemsService:
     def __init__(self, db: Session):
@@ -25,12 +31,19 @@ class ItemsService:
         6. proxy_return 저장
         7. item status를 RESERVED로 변경
         """
-        # 1. category 문자열 → category_id 변환
-        category = self.repo.get_category_by_name(rent_data.category_name)
+        # 1. category 문자열 → category_id 변환 (영문 → 한글 매핑)
+        category_name_kr = CATEGORY_NAME_MAP.get(rent_data.category_name.lower())
+        if not category_name_kr:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"카테고리 '{rent_data.category_name}'을(를) 찾을 수 없습니다. (umbrella 또는 powerbank 사용)",
+            )
+        
+        category = self.repo.get_category_by_name(category_name_kr)
         if not category:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"카테고리 '{rent_data.category_name}'을(를) 찾을 수 없습니다.",
+                detail=f"카테고리 '{category_name_kr}'을(를) 찾을 수 없습니다.",
             )
         
         # 2. 해당 category_id의 item 중 status='AVAILABLE'인 item 한 개 선택
@@ -38,7 +51,7 @@ class ItemsService:
         if not available_item:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"'{rent_data.category_name}' 카테고리에 대여 가능한 물품이 없습니다.",
+                detail=f"'{category_name_kr}' 카테고리에 대여 가능한 물품이 없습니다.",
             )
         
         # pickup_on 파싱
