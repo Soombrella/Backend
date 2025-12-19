@@ -12,11 +12,8 @@ from app.admin.schema.admin import (
     ItemResponse,
 )
 
-# 영문 → 한글 카테고리 매핑
-CATEGORY_NAME_MAP = {
-    "umbrella": "우산",
-    "powerbank": "보조배터리",
-}
+# 유효한 카테고리명
+VALID_CATEGORY_NAMES = ["umbrella", "powerbank"]
 
 
 class AdminService:
@@ -193,20 +190,20 @@ class AdminService:
 
     def create_item(self, data: ItemCreate) -> dict:
         """물품 생성"""
-        # 영문 카테고리명 → 한글 변환
-        category_name_kr = CATEGORY_NAME_MAP.get(data.category_name.lower())
-        if not category_name_kr:
+        # 카테고리명 검증
+        category_name = data.category_name.lower()
+        if category_name not in VALID_CATEGORY_NAMES:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"카테고리 '{data.category_name}'을(를) 찾을 수 없습니다. (umbrella 또는 powerbank 사용)",
             )
         
         # 카테고리 존재 확인
-        category = self.repo.get_category_by_name(category_name_kr)
+        category = self.repo.get_category_by_name(category_name)
         if not category:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"카테고리 '{category_name_kr}'이(가) DB에 존재하지 않습니다.",
+                detail=f"카테고리 '{category_name}'이(가) DB에 존재하지 않습니다.",
             )
         
         # 시리얼 번호 중복 체크
@@ -257,20 +254,20 @@ class AdminService:
                 detail="물품을 찾을 수 없습니다.",
             )
         
-        # 카테고리 존재 확인 (영문 → 한글 변환)
+        # 카테고리 존재 확인
         category_id_to_update = None
         if data.category_name is not None:
-            category_name_kr = CATEGORY_NAME_MAP.get(data.category_name.lower())
-            if not category_name_kr:
+            category_name = data.category_name.lower()
+            if category_name not in VALID_CATEGORY_NAMES:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"카테고리 '{data.category_name}'을(를) 찾을 수 없습니다. (umbrella 또는 powerbank 사용)",
                 )
-            category = self.repo.get_category_by_name(category_name_kr)
+            category = self.repo.get_category_by_name(category_name)
             if not category:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"카테고리 '{category_name_kr}'이(가) DB에 존재하지 않습니다.",
+                    detail=f"카테고리 '{category_name}'이(가) DB에 존재하지 않습니다.",
                 )
             category_id_to_update = category.category_id
         
